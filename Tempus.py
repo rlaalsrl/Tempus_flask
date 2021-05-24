@@ -53,12 +53,13 @@ def imgupload():
     if request.method == 'POST' and request.files['image']:
         
     	img = request.files['image']
-    	img_name = secure_filename(img.filename)
-    	saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
-    	img.save(saved_path)
-    	return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
+    	img_name = secure_filename(img.filename)#key값으로 이름변경
+    	#saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
+    	img.save()
+    	#return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
+        return "Image receive"
     else:
-    	return "Iamge not found"
+    	return "Image not found"
 
 
 # @app.route('/mainboard')
