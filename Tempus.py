@@ -3,8 +3,13 @@ from flask import url_for, send_from_directory
 import json
 import os
 from werkzeug.utils import secure_filename
+import sqlite3
 
 #from pymongo import MongoClient
+def json_trans(jsondata):
+    strjson = str(jsondata).replace("[","")
+    strjson = strjson.replace("]","") 
+    return strjson
 
 app = Flask(__name__)
 
@@ -52,21 +57,66 @@ def send_board():
 def imgupload():
     if request.method == 'POST' and request.files['image']:
         
-    	img = request.files['image']
-    	img_name = secure_filename(img.filename)#key값으로 이름변경
-    	#saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
-    	img.save()
-    	#return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
+        img = request.files['image']
+        img_name = secure_filename(img.filename)#key값으로 이름변경
+        #saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
+        img.save()
+        #return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
         return "Image receive"
     else:
-    	return "Image not found"
+        return "Image not found"
 
 
-# @app.route('/mainboard')
-# def send_mainboard():
-#     im = Image.open('test.jpg')
-#     return im
+@app.route('/login',methods=['HEAD','GET','POST'])
+def login():
+    jsonData = request.get_json()
+    auth = 'error'
+    try:
+        conn = sqlite3.connect("Tempus.db", isolation_level=None)
+        c = conn.cursor()
+        #print(val)
+        param1=jsonData["email"]
+        param2=jsonData["password"]
+        #c.execute("SELECT * FROM user")
+        c.execute("SELECT * FROM user WHERE email=:id and password=:pw",{"id":jsonData["email"],"pw":jsonData["password"]})
+        #c.execute("SELECT * FROM user WHERE email=? and password=?",param1,param2)
+        if c.fetchall()==[]:
+            auth='error'
+            print("null")
+        else:
+            auth='ok'
+            print("ok")
+        
+    except:
+        # c.execute("SELECT * FROM user")
+        # print(c.fetchall())
+        auth='error'
+        print("error")
+    #print(jsonData)
+    # json_loginstring = jsonData['email']
+    #print(jsonData["email"])
+    return auth
 
+@app.route('/signup',methods=['HEAD','GET','POST'])
+def signup():
+    jsonData = request.get_json()
+    problem = "ok"
+    #print(jsonData)
+    try:
+        conn = sqlite3.connect("Tempus.db", isolation_level=None)
+        c = conn.cursor()
+        val = [jsonData["email"],jsonData["name"],jsonData["pnum"],jsonData["address"],jsonData["password"]]
+        #print(val)
+        c.execute("INSERT INTO user \
+            VALUES(?,?,?,?,?)", val)
+        c.execute("SELECT * FROM user")
+        print(c.fetchall())  
+    except:
+        problem = "error"
+        print("error")
+    # json_loginstring = jsonData['email']
+    # print(jsonData["email"])
+    return problem
 
 
 if __name__ == '__main__':
