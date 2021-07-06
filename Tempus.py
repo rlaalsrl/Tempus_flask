@@ -1,4 +1,4 @@
-from flask import Flask,request,jsonify,g
+from flask import Flask,request,jsonify,g,render_template
 from flask import url_for, send_from_directory
 import json
 import os
@@ -9,15 +9,19 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from eunjeon import Mecab
 from collections import Counter
+import tempfile
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
+#from werkzeug import redirect
+from flask.helpers import flash
 
 
 total_data = pd.read_table('ratings_total.txt', names=['ratings', 'reviews'])
 total_data['label'] = np.select([total_data.ratings > 3], [1], default=0)
 total_data['ratings'].nunique(), total_data['reviews'].nunique(), total_data['label'].nunique()
 total_data.drop_duplicates(subset=['reviews'], inplace=True)
+
 train_data, test_data = train_test_split(total_data, test_size = 0.25, random_state = 42)
 train_data['reviews'] = train_data['reviews'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 train_data['reviews'].replace('', np.nan, inplace=True)
@@ -101,7 +105,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return 'Hello, server'
+
+    return render_template('C:/Users/real1/OneDrive/Desktop/Tempus_flask/upload.html')
 
 @app.route('/addboard',methods=['HEAD','GET','POST'])
 def addpost():
@@ -136,19 +141,62 @@ def send_board():
     return Str
     f.close()
 
-@app.route('/imgupload',methods=['HEAD','GET','POST'])
-
+@app.route('/imgupload',methods=['GET','POST'])
 def imgupload():
-    if request.method == 'POST' and request.files['image']:
+
+    file = request.files["uploadedfile"]
+    file.save("C:/Users/real1/OneDrive/Desktop/Tempus_flask/"+secure_filename(file.filename))
+
+    return "업로드 성공"
+
+
+
+
+    # if request.method == 'POST':
         
-        img = request.files['image']
-        img_name = secure_filename(img.filename)#key값으로 이름변경
-        #saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
-        img.save()
-        #return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
-        return "Image receive"
-    else:
-        return "Image not found"
+    #     if 'file' not in request.files:
+    #         flash('No file part')
+    #         #return redirect(request.url)
+    #     f= request.files['file']
+    #     if f:
+    #         f.save(secure_filename(f.filename))
+    #         f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+    #         return "Success"
+    # else:
+    #     return "Welcome to server"
+        
+        
+        
+        
+        # file = request.files["image0"]
+        # file.save("C:/Users/real1/OneDrive/Desktop/Tempus_flask/"+secure_filename(file.filename))
+
+        # raw_data = request.get_data()
+        # file = request.files['/storage/emulated/0/Pictures/photos/JPEG_20210705_162145.jpg']
+        # print(raw_data)
+        # print(file)
+        # file.save("C:/Users/real1/OneDrive/Desktop/Tempus_flask/"+secure_filename(file.filename))
+
+
+        #file.save(os.path.join("uploads",file.filename))
+
+        # f = request.FILES['file']#f에 none값 해결부터
+        # #저장할 경로 + 파일명
+        # f.save('C:/Users/real1/OneDrive/Desktop/Tempus_flask/test.jpg')
+        # files = os.listdir("./uploads")
+        # return render_template('check.html')
+        # img = request.files.get('image/jpg')
+        # img_name = secure_filename("test")#key값으로 이름변경
+        # #saved_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
+        # try:
+        #     img.save(saved_path)
+        # except AttributeError:
+        #     print("Couldn't save image")
+        # #return send_from_directory(app.config['UPLOAD_FOLDER'],img_name, as_attachment=True)
+    #     return "파일 업로드 성공"
+    # else:
+    #     return "Image not found"
+
 
 
 @app.route('/login',methods=['HEAD','GET','POST'])
@@ -218,4 +266,6 @@ def sentimentAnalysis():
 
 
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
+    app.config['SESSION_TYPE'] = 'filesystem'
     app.run(host="192.168.0.3",debug=True)
