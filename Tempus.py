@@ -123,23 +123,31 @@ def addpost():
 
 @app.route('/board')
 def send_board():
-    f = open("board.txt",'r')
-    #Str = f.readlines()
-    Str = f.read()
-    Str = '['+ Str + ']'
-    print(Str)
-    # S=0
-    # for S in range(len(Str)):
-    #     return Str[S]
-    #print(Str)
-    #return Str[1]
-    #for j in range(jsons):
-    #jsons = json.loads(Str.replace("'", "\""))
-    #print(jsons)
-    #print(jsons['Author'])
-    #return json.dumps(jsons)
-    return Str
-    f.close()
+    jsonData = request.get_json()
+    try:
+    # f = open("board.txt",'r')
+    # #Str = f.readlines()
+    # Str = f.read()
+    # Str = '['+ Str + ']'
+    # print(Str)
+    # # S=0
+    # # for S in range(len(Str)):
+    # #     return Str[S]
+    # #print(Str)
+    # #return Str[1]
+    # #for j in range(jsons):
+    # #jsons = json.loads(Str.replace("'", "\""))
+    # #print(jsons)
+    # #print(jsons['Author'])
+    # #return json.dumps(jsons)
+    # return Str
+    # f.close()
+        conn = sqlite3.connect("user_board.db", isolation_level=None)
+        c = conn.cursor()
+        c.execute("SELECT * FROM user_board WHERE email=:id",{"id":jsonData["email"]})
+        return c.fetchall
+    except:
+        print("errer")
 
 @app.route('/imgupload',methods=['GET','POST'])
 def imgupload():
@@ -269,3 +277,23 @@ if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.config['SESSION_TYPE'] = 'filesystem'
     app.run(host="192.168.0.3",debug=True)
+
+# board 액티비티 - 현재는 게시판명을 제외한 나머지만 서버에 전달하지만, 게시판명도 게시판을 구분하기 위해 서버에 전달이 필요할듯
+# (현재 게시판명은 board main에서 board, content 액티비티에 intent로 전달해서 사용 중)
+# - 이하 변수들은 모두 board, content 액티비티에서 사용
+# - WR_ID : 유저를 구분할 유저번호 또는 닉네임
+# - WR_TYPE : 일반/지출목록 형식 구분
+# - WR_DATE : 작성일자
+# - WR_BODY : 글 내용
+# - GROUP : 게시판명
+# - 게시글 번호(현재는 추가 안되어있으나 추후 검색 기능을 추가했을 때 필요할 예정)
+
+
+# content 액티비티에서만 사용하는 변수 - 모두 서버와 통신 필요
+# - 댓글 작성자명
+# - 댓글 내용
+# - 댓글 작성 일자
+
+# user_boar
+
+# 기본키는 랜덤변수, 나머지는 email과 그룹명으로 구성된 db를 생성
