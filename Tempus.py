@@ -15,6 +15,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 #from werkzeug import redirect
 from flask.helpers import flash
+from flask import send_file
 
 
 total_data = pd.read_table('ratings_total.txt', names=['ratings', 'reviews'])
@@ -105,8 +106,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-
-    return render_template('C:/Users/real1/OneDrive/Desktop/Tempus_flask/upload.html')
+    return "hello"
+    # return render_template('C:/Users/real1/OneDrive/Desktop/Tempus_flask/upload.html')
 
 @app.route('/addboard',methods=['HEAD','GET','POST'])
 def addpost():
@@ -122,32 +123,72 @@ def addpost():
     return 'ok'
 
 @app.route('/board')
+# def send_board():
+#     jsonData = request.get_json()
+#     try:
+#     # f = open("board.txt",'r')
+#     # #Str = f.readlines()
+#     # Str = f.read()
+#     # Str = '['+ Str + ']'
+#     # print(Str)
+#     # # S=0
+#     # # for S in range(len(Str)):
+#     # #     return Str[S]
+#     # #print(Str)
+#     # #return Str[1]
+#     # #for j in range(jsons):
+#     # #jsons = json.loads(Str.replace("'", "\""))
+#     # #print(jsons)
+#     # #print(jsons['Author'])
+#     # #return json.dumps(jsons)
+#     # return Str
+#     # f.close()
 def send_board():
     jsonData = request.get_json()
-    try:
-    # f = open("board.txt",'r')
-    # #Str = f.readlines()
-    # Str = f.read()
-    # Str = '['+ Str + ']'
-    # print(Str)
-    # # S=0
-    # # for S in range(len(Str)):
-    # #     return Str[S]
-    # #print(Str)
-    # #return Str[1]
-    # #for j in range(jsons):
-    # #jsons = json.loads(Str.replace("'", "\""))
-    # #print(jsons)
-    # #print(jsons['Author'])
-    # #return json.dumps(jsons)
-    # return Str
-    # f.close()
-        conn = sqlite3.connect("user_board.db", isolation_level=None)
-        c = conn.cursor()
-        c.execute("SELECT * FROM user_board WHERE email=:id",{"id":jsonData["email"]})
-        return c.fetchall
-    except:
-        print("errer")
+# try:
+#     f = open("board.txt",'r')
+#     Str = f.read()
+#     Str = '['+ Str + ']'
+#     print(Str)
+#     return Str
+#     f.close()
+# except:
+#     print("errer")
+# print(jsonData["email"])
+try:
+    conn = sqlite3.connect("user_board.db", isolation_level=None)
+    c = conn.cursor()
+    c.execute("SELECT board FROM user_board WHERE name=:id",{"id":"kim"})
+    
+    # dit = c.fetchall()
+    # data = {
+
+    # 'text': dit       
+    # }
+
+    # jsondata = json.dumps(data)
+    # load = json.loads(jsondata)
+    
+    # dit = c.fetchall()
+
+    fw = open("temp.txt","w")
+    for row in c.fetchall():
+        row_str = str(row)
+        data = { 
+            'text': row_str 
+            }
+        fw.write(str(data)+',\n')
+    fw.close()
+    fw = open("temp.txt","r")
+    load = fw.read()
+    fw.close()
+
+
+    board_list = '[' + str(load) + ']'
+    return board_list
+except:
+    print("errer")
+
 
 @app.route('/imgupload',methods=['GET','POST'])
 def imgupload():
@@ -206,7 +247,10 @@ def imgupload():
     #     return "Image not found"
 
 
-
+@app.route('/imgdownload',methods=['HEAD','GET','POST'])
+def imgsend():
+    return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/test_img.jpg",mimetype='image/jpg')
+    
 @app.route('/login',methods=['HEAD','GET','POST'])
 def login():
     jsonData = request.get_json()
