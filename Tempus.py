@@ -109,86 +109,64 @@ def home():
     return "hello"
     # return render_template('C:/Users/real1/OneDrive/Desktop/Tempus_flask/upload.html')
 
+# @app.route('/addboard',methods=['HEAD','GET','POST'])
+# def addpost():
+#     #print(request.is_json)
+#     jsonData = request.get_json()
+#     print(jsonData)
+#     #print(jsonData[0]['Title'])
+#     f = open("board.txt",'a')
+#     strjson = str(jsonData).replace("[","")
+#     strjson = strjson.replace("]","") 
+#     f.write(strjson+',\n')
+#     f.close()
+#     return 'ok'
+
 @app.route('/addboard',methods=['HEAD','GET','POST'])
 def addpost():
-    #print(request.is_json)
     jsonData = request.get_json()
-    print(jsonData)
-    #print(jsonData[0]['Title'])
-    f = open("board.txt",'a')
-    strjson = str(jsonData).replace("[","")
-    strjson = strjson.replace("]","") 
-    f.write(strjson+',\n')
-    f.close()
-    return 'ok'
-
-@app.route('/board')
-# def send_board():
-#     jsonData = request.get_json()
-#     try:
-#     # f = open("board.txt",'r')
-#     # #Str = f.readlines()
-#     # Str = f.read()
-#     # Str = '['+ Str + ']'
-#     # print(Str)
-#     # # S=0
-#     # # for S in range(len(Str)):
-#     # #     return Str[S]
-#     # #print(Str)
-#     # #return Str[1]
-#     # #for j in range(jsons):
-#     # #jsons = json.loads(Str.replace("'", "\""))
-#     # #print(jsons)
-#     # #print(jsons['Author'])
-#     # #return json.dumps(jsons)
-#     # return Str
-#     # f.close()
-def send_board():
-    jsonData = request.get_json()
-# try:
-#     f = open("board.txt",'r')
-#     Str = f.read()
-#     Str = '['+ Str + ']'
-#     print(Str)
-#     return Str
-#     f.close()
-# except:
-#     print("errer")
-# print(jsonData["email"])
-try:
     conn = sqlite3.connect("user_board.db", isolation_level=None)
     c = conn.cursor()
-    c.execute("SELECT board FROM user_board WHERE name=:id",{"id":"kim"})
-    
-    # dit = c.fetchall()
-    # data = {
+    val = [jsonData["WR_ID"],jsonData["WR_BODY"]]
+    c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val)   
+    print(jsonData)
 
-    # 'text': dit       
-    # }
+    return 'ok'
 
-    # jsondata = json.dumps(data)
-    # load = json.loads(jsondata)
-    
-    # dit = c.fetchall()
-
-    fw = open("temp.txt","w")
-    for row in c.fetchall():
-        row_str = str(row)
-        data = { 
-            'text': row_str 
-            }
-        fw.write(str(data)+',\n')
-    fw.close()
-    fw = open("temp.txt","r")
-    load = fw.read()
-    fw.close()
-
-
-    board_list = '[' + str(load) + ']'
-    return board_list
-except:
-    print("errer")
-
+@app.route('/board',methods=['HEAD','GET','POST'])
+def send_board():
+    jsonData = request.get_json()
+    print(jsonData["email"])
+    # print(jsonData["WR_ID"])
+    # print(jsonData["WR_TYPE"])
+    # print(jsonData["WR_DATE"])
+    # print(jsonData["WR_BODY"])
+    try:
+        conn = sqlite3.connect("user_board.db", isolation_level=None)
+        c = conn.cursor()
+        c.execute("SELECT board FROM user_board WHERE name=:id",{"id":jsonData["email"]})
+        
+        fw = open("temp.txt","w")
+        for row in c.fetchall():
+            row_str = str(row)
+            print(row_str)
+            row_str=row_str.replace("(","")
+            row_str=row_str.replace(")","")
+            row_str=row_str.replace(",","")
+            row_str=row_str.replace("'","")
+            data = { 
+                'text': row_str 
+                }
+            fw.write(str(data)+',\n')
+        fw.close()
+        fw = open("temp.txt","r")
+        load = fw.read()
+        fw.close()
+        board_list = '[' + str(load) + ']'
+        print(board_list)
+        return board_list
+    except:
+        print("errer")
 
 @app.route('/imgupload',methods=['GET','POST'])
 def imgupload():

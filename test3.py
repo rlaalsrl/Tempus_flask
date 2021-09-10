@@ -24,19 +24,27 @@ app = Flask(__name__)
 def home():
     return "hello"
 
+
+
+@app.route('/imgdownload',methods=['HEAD','GET','POST'])
+def imgsend():
+    return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/test_img.jpg",mimetype='image/jpg')
+
+@app.route('/addboard',methods=['HEAD','GET','POST'])
+def addpost():
+    jsonData = request.get_json()
+    conn = sqlite3.connect("user_board.db", isolation_level=None)
+    c = conn.cursor()
+    val = [jsonData["WR_ID"],jsonData["WR_BODY"]]
+    c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val)   
+    print(jsonData)
+
+    return 'ok'
+
 @app.route('/board',methods=['HEAD','GET','POST'])
 def send_board():
     jsonData = request.get_json()
-    # try:
-    #     f = open("board.txt",'r')
-    #     Str = f.read()
-    #     Str = '['+ Str + ']'
-    #     print(Str)
-    #     return Str
-    #     f.close()
-    # except:
-    #     print("errer")
-
+    print(jsonData["email"])
     # print(jsonData["WR_ID"])
     # print(jsonData["WR_TYPE"])
     # print(jsonData["WR_DATE"])
@@ -44,22 +52,16 @@ def send_board():
     try:
         conn = sqlite3.connect("user_board.db", isolation_level=None)
         c = conn.cursor()
-        c.execute("SELECT board FROM user_board WHERE name=:id",{"id":"kim"})
+        c.execute("SELECT board FROM user_board WHERE name=:id",{"id":jsonData["email"]})
         
-        # dit = c.fetchall()
-        # data = {
-
-        # 'text': dit       
-        # }
-
-        # jsondata = json.dumps(data)
-        # load = json.loads(jsondata)
-        
-        # dit = c.fetchall()
-
         fw = open("temp.txt","w")
         for row in c.fetchall():
             row_str = str(row)
+            print(row_str)
+            row_str=row_str.replace("(","")
+            row_str=row_str.replace(")","")
+            row_str=row_str.replace(",","")
+            row_str=row_str.replace("'","")
             data = { 
                 'text': row_str 
                 }
@@ -68,29 +70,12 @@ def send_board():
         fw = open("temp.txt","r")
         load = fw.read()
         fw.close()
-
-
         board_list = '[' + str(load) + ']'
+        print(board_list)
         return board_list
     except:
         print("errer")
 
-@app.route('/imgdownload',methods=['HEAD','GET','POST'])
-def imgsend():
-    return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/test_img.jpg",mimetype='image/jpg')
-
-@app.route('/addboard',methods=['HEAD','GET','POST'])
-def addpost():
-    #print(request.is_json)
-    jsonData = request.get_json()
-    print(jsonData)
-    # print(jsonData["WR_ID"])
-    # f = open("board.txt",'a')
-    # strjson = str(jsonData).replace("[","")
-    # strjson = strjson.replace("]","") 
-    # f.write(strjson+',\n')
-    # f.close()
-    return 'ok'
 
 
 if __name__ == '__main__':
