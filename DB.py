@@ -38,13 +38,15 @@ c = conn.cursor()
 # jsondata = json.dump(c.execute,'w')
 # print(c.fetchall())
 # print(jsondata)
-# print(c.execute("DELETE FROM user_board").rowcount)#데이터 전체 삭제
+print(c.execute("DELETE FROM user_board").rowcount)#데이터 전체 삭제
 
-val = ["admin","zzz"]
+
 # c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val)
-# c.execute("select * FROM user_board")
-params=("admin")
-c.execute("SELECT board FROM user_board WHERE name='admin'")
-text = str(c.fetchone())
-text=text.replace('(','')
-print(text)
+c.execute("select * FROM user_board")
+print(c.fetchall())
+# val = ["admin","zzz"]
+# params=("admin")
+# c.execute("SELECT board FROM user_board WHERE name='admin'")
+# text = str(c.fetchone())
+# text=text.replace('(','')
+# print(text)

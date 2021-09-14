@@ -22,9 +22,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
 import re
+# from webdriver_manager.chrome import ChromeDriverManager
+
  
-# 다나와 사이트 검색
- 
+# 네이버 쇼핑 검색
+# driver = webdriver.Chrome(ChromeDriverManager().install()) 
 options = Options()
 options.add_argument('headless'); # headless는 화면이나 페이지 이동을 표시하지 않고 동작하는 모드
  
@@ -38,9 +40,19 @@ driver.implicitly_wait(5)
  
 # 브라우저 사이즈
 driver.set_window_size(1920,1280)
- 
+
+driver.get('https://shopping.naver.com/home/p/index.naver')# 네이버 쇼핑 메인창
+xpath2 = "/html/body/div[1]/div[1]/div/div[2]/div/div[2]/div/div[1]/form/fieldset/div[1]/input[1]"
+search = driver.find_element_by_name("query")
+search.clear()
+search.send_keys("컴퓨터")
+time.sleep(1)
+search.send_keys("\n")
+time.sleep(1)
+
+
 # 페이지 이동(열고 싶은 URL)
-driver.get('https://search.shopping.naver.com/search/category?catId=50000151')
+# driver.get('https://search.shopping.naver.com/search/category?catId=50000151')
  
 # 페이지 내용
 # print('Page Contents : {}'.format(driver.page_source))
@@ -57,6 +69,7 @@ driver.get('https://search.shopping.naver.com/search/category?catId=50000151')
 # print('After Page Contents : {}'.format(driver.page_source))
  
 # 검색 결과가 렌더링 될 때까지 잠시 대기
+
 time.sleep(2)
  
 # 현재 페이지
