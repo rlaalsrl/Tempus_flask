@@ -26,6 +26,7 @@ import time
 import re
 import xlsxwriter
 import pandas as pd
+import openpyxl
 
 total_data = pd.read_table('ratings_total.txt', names=['ratings', 'reviews'])
 total_data['label'] = np.select([total_data.ratings > 3], [1], default=0)
@@ -223,10 +224,17 @@ def productSearch(productname):
 def prdctRcmnd(prdctname):
     productSearch(prdctname)
     data = pd.read_excel("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+".xlsx", engine="openpyxl",thousands = ',')
-    data = data.sort_values(by="가격")
-    with pd.ExcelWriter("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+"_sort.xlsx",engine="openpyxl") as writer:
-        data.to_excel(writer,sheet_name="sheet1",index=False)
-        
+    excel_path =  "C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+".xlsx"
+    wb = openpyxl.load_workbook(excel_path)
+    sh = wb.active
+    last_row = sh.max_row
+    sentiment_predict()
+    
+    # data = data.sort_values(by="가격")
+    # with pd.ExcelWriter("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+"_sort.xlsx",engine="openpyxl") as writer:
+    #     data.to_excel(writer,sheet_name="sheet1",index=False) #최저가로 정렬 출력
+
+    
 
 if __name__ == '__main__':
     prdctRcmnd("화장품")

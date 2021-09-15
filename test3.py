@@ -17,11 +17,20 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from flask.helpers import flash
 from flask import send_file
 import xlsxwriter
-import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 import pandas as pd
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image as XLImage
+from openpyxl import load_workbook
 import openpyxl
+from PIL import Image as PILImage
+import xlrd
+from collections import OrderedDict
+import json
+
+
+
 app = Flask(__name__)
 
 
@@ -193,29 +202,20 @@ def addpost():
     jsonData = request.get_json()
     print(jsonData)
     now = datetime.now()
-    curtime = str(now.month) + "-" + str(now.day) + " " + str(now.hour) + ":" + str(now.minute)
-    wb = openpyxl.load_workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["GROUP"])+'.xlsx')
+    curtime = str(now.month) + "월" + str(now.day) + "일 " + str(now.hour) + ":" + str(now.minute)
+    wb = openpyxl.load_workbook(r"C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["GROUP"])+'.xlsx')
     sheet = wb.active
     last_row = sheet.max_row
+    sheet["A"+str(last_row+1)]=str(jsonData["WR_ID"])
+    sheet["B"+str(last_row+1)]=str(jsonData["WR_BODY"])
+    sheet["C"+str(last_row+1)]=str(jsonData["WR_TYPE"])
+    sheet["D"+str(last_row+1)]=str(curtime)
+    wb.save("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["GROUP"])+'.xlsx')
+    
     print(last_row)
     wb.close()
 
-    # workbook = xlsxwriter.Workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["GROUP"])+'.xlsx')
-    # worksheet = workbook.add_worksheet()
     
-    # worksheet.set_column('A:A', 40) # A 열의 너비를 40으로 설정
-    # worksheet.set_row(0,18) # A열의 높이를 18로 설정
-    # worksheet.set_column('B:B', 12) # B 열의 너비를 12로 설정
-    # worksheet.set_column('C:C', 60) # C 열의 너비를 60으로 설정
-
-    # worksheet.write(0, 0, "ID")
-    # worksheet.write(0, 1, '내용')
-    # worksheet.write(0, 2, '타입')
-    # worksheet.write(0, 3, 'date')
-
-    # wb = pd.read_excel("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["GROUP"])+'.xlsx',engine="openpyxl")
-    
-
     # worksheet.write(excel_row, 0, jsonData["WR_ID"])
     # worksheet.write(excel_row, 1, jsonData["WR_BODY"])
     # worksheet.write(excel_row, 2, jsonData["WR_TYPE"])
@@ -223,6 +223,68 @@ def addpost():
     # workbook.close()
 
     return 'ok'
+
+@app.route('/imgupload_Post',methods=['GET','POST'])
+def imgupload_post():
+    file = request.files["uploadedfile"]
+    file.save("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img_post/"+secure_filename(file.filename)+'.jpg')
+    # img = Image("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img_post/test.jpg")
+    img = XLImage("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img_post/"+secure_filename(file.filename)+'.jpg')
+    wb = openpyxl.load_workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+secure_filename(file.filename)+".xlsx")
+    sheet = wb.active
+    last_row = sheet.max_row
+    sheet.add_image(img,"E"+str(last_row))
+    wb.save(filename="C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+secure_filename(file.filename)+".xlsx")
+    wb.close()
+    # print(temp_id)
+    
+
+    return "업로드 성공"
+
+@app.route('/Post',methods=['HEAD','GET','POST'])
+def post():
+    jsonData = request.get_json()
+    # print(jsonData)
+    excel_path = 'C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/'+str(jsonData["WR_GROUP"])+'.xlsx'
+    # print(excel_path)
+    wb = openpyxl.load_workbook(excel_path)
+    sh = wb.active
+    last_row = sh.max_row
+    fw = open('C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/'+str(jsonData["WR_GROUP"])+'.txt',"w")
+    for rownum in range(1,last_row):
+        # row_str = str(rownum)
+        # print(row_str)
+
+        data = { 
+            'ID': str(sh["A"+str(rownum+1)].value),
+            'BODY': str(sh["B"+str(rownum+1)].value), 
+            'TPYE': str(sh["c"+str(rownum+1)].value),
+            'DATE': str(sh["D"+str(rownum+1)].value)  
+            }
+        fw.write(str(data)+',\n')
+    fw.close()
+    fw = open('C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/'+str(jsonData["WR_GROUP"])+'.txt',"r")
+    load = fw.read()
+    fw.close()
+    post_list = '[' + str(load) + ']'
+    # data_list = []
+
+    # for rownum in range(1, sh.nrows):
+    #     data = OrderedDict()
+    #     row_values = sh.row_values(rownum)
+    #     data['ID'] = row_values[0]
+    #     data['내용'] = row_values[1]
+    #     data['타입'] = row_values[2]
+    #     data['date'] = row_values[3]
+    #     data_list.append(data)
+
+    # j = json.dumps(data_list, ensure_ascii=False)
+
+    # with open('C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/'+str(jsonData["WR_GROUP"])+'.json', 'w+') as f:
+    #     f.write(j)
+    return post_list
+    
+
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
