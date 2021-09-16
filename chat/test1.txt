@@ -1,4 +1,2 @@
-{'ID': 'admin', 'BODY': '1234', 'TPYE': '1', 'DATE': '9월15일 9:40'},
-{'ID': 'admin', 'BODY': 'asdf', 'TPYE': '1', 'DATE': '9월15일 11:1'},
-{'ID': 'admin', 'BODY': '안녕하세요', 'TPYE': '1', 'DATE': '9월15일 21:26'},
-{'ID': 'admin', 'BODY': '테스트 중입니다', 'TPYE': '1', 'DATE': '9월15일 21:28'},
+{'ID': 'admin', 'BODY': 'hello', 'TYPE': '1', 'DATE': '9월16일 12:40', 'WR_PNAME': 'None', 'WR_PRICE': 'None', 'WR_TAG': 'None', 'WR_MEMO': 'None'},
+{'ID': 'admin', 'BODY': 'None', 'TYPE': '2', 'DATE': '9월16일 12:41', 'WR_PNAME': 'cat', 'WR_PRICE': '49999', 'WR_TAG': '1234', 'WR_MEMO': 'test'},

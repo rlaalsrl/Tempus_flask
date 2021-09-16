@@ -266,6 +266,7 @@ def post():
     fw = open('C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/'+str(jsonData["WR_GROUP"])+'.txt',"r")
     load = fw.read()
     fw.close()
+    wb.close()
     post_list = '[' + str(load) + ']'
     # data_list = []
 

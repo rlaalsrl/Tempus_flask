@@ -128,6 +128,9 @@ def productSearch(productname):
     worksheet.write(0, 0, '제품 모델명')
     worksheet.write(0, 1, '가격')
     worksheet.write(0, 2, '링크')
+    worksheet.write(0, 3, '리뷰')
+    worksheet.write(0, 4, '감정분석 스코어')
+    worksheet.write(0, 5, '추천점수')
     # webdirver 설정(Chrome, Firefox 등)
     # chromedriver_autoinstaller.install()
     driver = webdriver.Chrome(options=options) # 브라우저 창 안보이기
@@ -182,7 +185,7 @@ def productSearch(productname):
             driver.get(review_link)
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             review_list = soup.select('p.reviewItems_text__XIsTc')
-           
+            temp_str = ""
             for r in review_list:
 
                 r.text.strip()
@@ -190,7 +193,8 @@ def productSearch(productname):
                 r.replace('<br/>','')
                 r = re.sub('<.+?>','',r,0).strip()
                 print(r)
-                worksheet.write(excel_row,3,r)
+                temp_str = temp_str + r +"\n"
+                worksheet.write(excel_row,3,temp_str)
                 print()
             excel_row += 1
             driver.back()
@@ -223,18 +227,25 @@ def productSearch(productname):
 
 def prdctRcmnd(prdctname):
     productSearch(prdctname)
-    data = pd.read_excel("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+".xlsx", engine="openpyxl",thousands = ',')
     excel_path =  "C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+".xlsx"
     wb = openpyxl.load_workbook(excel_path)
     sh = wb.active
     last_row = sh.max_row
-    sentiment_predict()
     
-    # data = data.sort_values(by="가격")
-    # with pd.ExcelWriter("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+"_sort.xlsx",engine="openpyxl") as writer:
-    #     data.to_excel(writer,sheet_name="sheet1",index=False) #최저가로 정렬 출력
+    for rownum in range(1,last_row):
+        score = sentiment_predict(str(sh["D"+str(rownum+1)].value))
+        sh["E"+str(rownum+1)] = score
+        sh["F"+str(rownum+1)] = (1/int(sh["B"+str(rownum+1)].value) * score) * 100000000
+        print(score)
+    wb.save(excel_path)
+    wb.close()
+
+    data = pd.read_excel("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+".xlsx", engine="openpyxl",thousands = ',')
+    data = data.sort_values(by="추천점수",ascending=False)
+    with pd.ExcelWriter("C:/Users/real1/OneDrive/Desktop/Tempus_flask/xlsx/"+prdctname+"_sort.xlsx",engine="openpyxl") as writer:
+        data.to_excel(writer,sheet_name="sheet1",index=False) 
 
     
 
 if __name__ == '__main__':
-    prdctRcmnd("화장품")
+    prdctRcmnd("컴퓨터")

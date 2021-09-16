@@ -38,7 +38,7 @@ c = conn.cursor()
 # jsondata = json.dump(c.execute,'w')
 # print(c.fetchall())
 # print(jsondata)
-# print(c.execute("DELETE FROM user_board").rowcount)#데이터 전체 삭제
+print(c.execute("DELETE FROM user_board").rowcount)#데이터 전체 삭제
 
 
 # c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val)
