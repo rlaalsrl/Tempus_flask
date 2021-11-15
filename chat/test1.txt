@@ -1,2 +1,0 @@
-{'ID': 'admin', 'BODY': 'hello', 'TYPE': '1', 'DATE': '9월16일 12:40', 'WR_PNAME': 'None', 'WR_PRICE': 'None', 'WR_TAG': 'None', 'WR_MEMO': 'None'},
-{'ID': 'admin', 'BODY': 'None', 'TYPE': '2', 'DATE': '9월16일 12:41', 'WR_PNAME': 'cat', 'WR_PRICE': '49999', 'WR_TAG': '1234', 'WR_MEMO': 'test'},

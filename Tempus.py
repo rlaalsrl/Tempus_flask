@@ -45,10 +45,10 @@ total_data.drop_duplicates(subset=['reviews'], inplace=True)
 train_data, test_data = train_test_split(total_data, test_size = 0.25, random_state = 42)
 train_data['reviews'] = train_data['reviews'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 train_data['reviews'].replace('', np.nan, inplace=True)
-test_data.drop_duplicates(subset = ['reviews'], inplace=True) # 중복 제거
-test_data['reviews'] = test_data['reviews'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","") # 정규 표현식 수행
-test_data['reviews'].replace('', np.nan, inplace=True) # 공백은 Null 값으로 변경
-test_data = test_data.dropna(how='any') # Null 값 제거
+test_data.drop_duplicates(subset = ['reviews'], inplace=True)
+test_data['reviews'] = test_data['reviews'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
+test_data['reviews'].replace('', np.nan, inplace=True) 
+test_data = test_data.dropna(how='any') 
 mecab = Mecab()
 
 stopwords = ['도', '는', '다', '의', '가', '이', '은', '한', '에', '하', '고', '을', '를', '인', '듯', '과', '와', '네', '들', '듯', '지', '임', '게']
@@ -112,10 +112,6 @@ def sentiment_predict(new_sentence):
     encoded = tokenizer.texts_to_sequences([new_sentence]) # 정수 인코딩
     pad_new = pad_sequences(encoded, maxlen = max_len) # 패딩
     score = float(loaded_model.predict(pad_new)) # 예측
-    # if(score > 0.5):
-    #     print("{:.2f}% 확률로 긍정 리뷰입니다.".format(score * 100))
-    # else:
-    #     print("{:.2f}% 확률로 부정 리뷰입니다.".format((1 - score) * 100))
     return score
 
 def productSearch(productname):
@@ -557,7 +553,39 @@ def productRecommendation():
     prd_list = '[' + str(load) + ']'
     return prd_list
 
-    
+@app.route('/imgdownload_post',methods=['GET','POST'])
+def imgsend_post():
+    fileName = request.get_json()
+    try:
+        if request.method == 'POST':
+            fw = open("temp_groupname.txt","w")
+            fw.write(fileName["name"])
+            fw.close()
+            fw2= open("temp_count.txt","w")
+            fw2.write(fileName["count"])
+            fw2.close()
+            return "ok"
+        elif request.method == 'GET':
+            fw = open("temp_groupname.txt","r")
+            load = fw.read()
+            fw.close()
+            fw2= open("temp_count.txt","r")
+            load_count = fw2.read()
+            fw2.close()
+            
+            wb = openpyxl.load_workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(load)+".xlsx")
+            sheet = wb.active
+            last_row = sheet.max_row
+            file = sheet["I"+str(load_count+1)].value
+            wb.close()
+            return send_file(file,mimetype='image/jpg')
+        # return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img/"+str(fileName["name"])+".jpg",mimetype='image/jpg')
+        # return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img/test1234.jpg",mimetype='image/jpg')
+    except:
+        print("img_post error")
+        return "errer"
+    # return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img/"+fileName["name"]+".jpg",mimetype='image/jpg')
+    # return send_file("C:/Users/real1/OneDrive/Desktop/Tempus_flask/img/test1234.jpg",mimetype='image/jpg')    
 
 
 if __name__ == '__main__':
@@ -584,3 +612,4 @@ if __name__ == '__main__':
 # user_boar
 
 # 기본키는 랜덤변수, 나머지는 email과 그룹명으로 구성된 db를 생성
+

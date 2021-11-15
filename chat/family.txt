@@ -1,0 +1,1 @@
+{'ID': 'ad', 'BODY': 'None', 'TYPE': '2', 'DATE': '9월16일 19:59', 'WR_PNAME': '자전거', 'WR_PRICE': '260000', 'WR_TAG': '자전거', 'WR_MEMO': '자전거'},

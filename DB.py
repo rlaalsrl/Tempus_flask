@@ -14,7 +14,8 @@ c = conn.cursor()
 #print(c.fetchone())
 #print(c.fetchall())
 # c.execute("Insert INTO user_board (name,board) VALUES('kim', '지하철 동호회')")
-# c.execute("select * FROM user_board")
+# c.execute("select * FROM user")
+# print(c.execute("DELETE FROM user").rowcount)
 # print(c.fetchall())
 
 # c.execute("SELECT board FROM user_board WHERE name=:id",{"id":"kim"})
@@ -42,7 +43,7 @@ print(c.execute("DELETE FROM user_board").rowcount)#데이터 전체 삭제
 
 
 # c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val)
-c.execute("select * FROM user_board")
+# c.execute("select * FROM user_board")
 print(c.fetchall())
 # val = ["admin","zzz"]
 # params=("admin")
