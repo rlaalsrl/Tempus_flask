@@ -282,25 +282,29 @@ def addboard():
     val = [jsonData["WR_ID"],jsonData["WR_BODY"]]
     c.execute("Insert INTO user_board (name,board) VALUES(?,?)",val) 
     temp_id = jsonData["WR_ID"] 
-    
-    workbook = xlsxwriter.Workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["WR_BODY"])+'.xlsx')
-    worksheet = workbook.add_worksheet()
-    
-    worksheet.set_column('A:A', 40) # A 열의 너비를 40으로 설정
-    worksheet.set_row(0,18) # A열의 높이를 18로 설정
-    worksheet.set_column('B:B', 12) # B 열의 너비를 12로 설정
-    worksheet.set_column('C:C', 60) # C 열의 너비를 60으로 설정
+    if os.path.exists("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["WR_BODY"])+'.xlsx'):
+        print(jsonData)
+        return 'ok'
+    else:
+        workbook = xlsxwriter.Workbook("C:/Users/real1/OneDrive/Desktop/Tempus_flask/chat/"+str(jsonData["WR_BODY"])+'.xlsx')
+        worksheet = workbook.add_worksheet()
+        
+        worksheet.set_column('A:A', 40) # A 열의 너비를 40으로 설정
+        worksheet.set_row(0,18) # A열의 높이를 18로 설정
+        worksheet.set_column('B:B', 12) # B 열의 너비를 12로 설정
+        worksheet.set_column('C:C', 60) # C 열의 너비를 60으로 설정
 
-    worksheet.write(0, 0, "ID")
-    worksheet.write(0, 1, '내용')
-    worksheet.write(0, 2, '타입')
-    worksheet.write(0, 3, 'date')
-    worksheet.write(0, 4, 'WR_PNAME')
-    worksheet.write(0, 5, 'WR_PRICE')
-    worksheet.write(0, 6, 'WR_TAG')
-    worksheet.write(0, 7, 'WR_MEMO')
-    workbook.close()
-    print(jsonData)
+        worksheet.write(0, 0, "ID")
+        worksheet.write(0, 1, '내용')
+        worksheet.write(0, 2, '타입')
+        worksheet.write(0, 3, 'date')
+        worksheet.write(0, 4, 'WR_PNAME')
+        worksheet.write(0, 5, 'WR_PRICE')
+        worksheet.write(0, 6, 'WR_TAG')
+        worksheet.write(0, 7, 'WR_MEMO')
+        workbook.close()
+        print(jsonData)
+    
 
     return 'ok'
 

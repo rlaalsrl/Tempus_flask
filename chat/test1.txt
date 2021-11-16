@@ -1,0 +1,2 @@
+{'ID': 'test1', 'BODY': 'None', 'TYPE': '2', 'DATE': '11월17일 1:1', 'WR_PNAME': '컴퓨터', 'WR_PRICE': '1240000', 'WR_TAG': '컴퓨터', 'WR_MEMO': '어렵네요'},
+{'ID': 'test2', 'BODY': 'test입니다', 'TYPE': '1', 'DATE': '11월17일 1:4', 'WR_PNAME': 'None', 'WR_PRICE': 'None', 'WR_TAG': 'None', 'WR_MEMO': 'None'},
